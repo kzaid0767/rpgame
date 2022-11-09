@@ -1,5 +1,12 @@
 import { getDiceRollArray, getDicePlaceholderHtml, getPercentage } from './utils.js'
 
+const font = ['fas fa-dice-one',
+'fas fa-dice-two',
+'fas fa-dice-three',
+'fas fa-dice-four',
+'fas fa-dice-five',
+'fas fa-dice-six']
+
 function Character(data) {
     Object.assign(this, data)
     this.maxHealth = this.health
@@ -9,7 +16,7 @@ function Character(data) {
     this.setDiceHtml = function() {
         this.currentDiceScore = getDiceRollArray(this.diceCount)
         this.diceHtml = this.currentDiceScore.map((num) =>
-            `<div class="dice">${num}</div>`).join("")
+            `<i class="${font[num-1]} dice"></i>`).join("")
     }
 
     this.takeDamage = function (attackScoreArray) {
@@ -25,7 +32,7 @@ function Character(data) {
     this.getHealthBarHtml = function () {
         const percent = getPercentage(this.health, this.maxHealth)
         return `<div class="health-bar-outer">
-                    <div class="health-bar-inner ${percent < 26 ? "danger" : ""}" 
+                    <div class='health-bar-inner ${percent < 26 ? "danger" : percent<50? "warning": ""}'   
                             style="width:${percent}%;">
                     </div>
                 </div>`  
@@ -40,7 +47,7 @@ function Character(data) {
                 <h4 class="name"> ${name} </h4>
                 <img class="avatar" src="${avatar}" />
                 <div class="health">health: <b> ${health} </b></div>
-                ${healthBar}
+                    ${healthBar}
                 <div class="dice-container">
                     ${diceHtml}
                 </div>

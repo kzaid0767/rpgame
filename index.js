@@ -4,6 +4,8 @@ import Character from './Character.js'
 let monstersArray = ["orc", "demon", "goblin"]
 let isWaiting = false
 
+const attackBtn = document.getElementById("attack-button")
+
 function getNewMonster() {
     const nextMonsterData = characterData[monstersArray.shift()]
     return nextMonsterData ? new Character(nextMonsterData) : {}
@@ -16,7 +18,13 @@ function attack() {
         wizard.takeDamage(monster.currentDiceScore)
         monster.takeDamage(wizard.currentDiceScore)
         render()
-        
+        const fas = document.querySelectorAll('.fas')
+        for(let el of fas){
+            el.classList.add('switch')
+        }
+        setTimeout(()=>{for(let el of fas){
+            el.classList.remove('switch')
+        }} ,900)
         if(wizard.dead){
             endGame()
         }
@@ -38,14 +46,15 @@ function attack() {
 
 function endGame() {
     isWaiting = true
+    attackBtn.hidden = true
     const endMessage = wizard.health === 0 && monster.health === 0 ?
         "No victors - all creatures are dead" :
         wizard.health > 0 ? "The Wizard Wins" :
-            "The monsters are Victorious"
+            `The ${monster.name} is Victorious`
 
     const endEmoji = wizard.health > 0 ? "🔮" : "☠️"
         setTimeout(()=>{
-            document.body.innerHTML = `
+            document.getElementById('main').innerHTML = `
                 <div class="end-game">
                     <h2>Game Over</h2> 
                     <h3>${endMessage}</h3>
@@ -53,15 +62,30 @@ function endGame() {
                 </div>
                 `
         }, 1500)
-}
+    }
+    
+    attackBtn.addEventListener('click', attack)
+    document.querySelector('#reset-button').addEventListener('click', restart)
 
-document.getElementById("attack-button").addEventListener('click', attack)
+function restart(){
+    isWaiting = false
+    attackBtn.hidden = false
+    monstersArray = ["orc", "demon", "goblin"]
+    document.getElementById('main').innerHTML = `<div id="hero">              
+    </div>
+    <div id="monster">
+    </div>`
+    monster = getNewMonster()
+    wizard = new Character(characterData.hero)
+    render()
+}
 
 function render() {
     document.getElementById('hero').innerHTML = wizard.getCharacterHtml()
     document.getElementById('monster').innerHTML = monster.getCharacterHtml()
 }
 
-const wizard = new Character(characterData.hero)
+let wizard = new Character(characterData.hero)
+
 let monster = getNewMonster()
 render()
